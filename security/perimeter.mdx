@@ -1,0 +1,27 @@
+---
+title: "1. Perimeter Security"
+description: "Internet gateway and external exposure"
+---
+
+# 1. Perimeter Security
+
+## Internet Gateway — ASUS EBG19P
+
+| Control | Status |
+|---------|--------|
+| WAN ping | Disabled |
+| UPnP | Disabled |
+| Wi-Fi encryption | WPA2-AES, SSID hidden |
+| Firmware | Current |
+| DoS protection | Enabled |
+| WAN-side management | Disabled |
+
+**Risk: LOW.** Adequate baseline for SOHO. The planned migration to OPNsense (EliteDesk 800 G4) will add stateful firewall, IDS/IPS, and granular logging.
+
+## External Exposure
+
+| Exposure | Status |
+|----------|--------|
+| Cloudflare Tunnel | miniapp.lecompound.us → HA dashboard :9119 |
+| Public IP | Behind Telstra CGNAT — no direct access |
+| Port forwards | Not enumerated (requires ASUS admin) |

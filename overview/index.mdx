@@ -1,0 +1,42 @@
+---
+title: "lecompound.ebg Homelab"
+description: "Network overview, security assessment, and infrastructure documentation"
+---
+
+# lecompound.ebg Homelab
+
+Welcome to the infrastructure documentation for the lecompound.ebg homelab network. This site covers the complete network topology, security posture assessment, and remediation plans.
+
+## Network at a Glance
+
+| Metric | Value |
+|--------|-------|
+| Internet | 5G Telstra (CGNAT) |
+| Gateway | ASUS EBG19P (192.168.50.1) |
+| Switch | UniFi USW-8-150W (192.168.50.10) |
+| VLANs | 5 (MGMT, IoT, CAMERA, ISOLATED, GUEST) |
+| Online Hosts | 7 |
+| Tailscale Nodes | 4 |
+| Overall Security | C+ (Developing) |
+
+## Quick Links
+
+- [Network Topology](/overview/topology) — Physical and logical layout
+- [Device Inventory](/reference/device-inventory) — All discovered hosts and services
+- [Security Review](/security/index) — 8-domain enterprise assessment
+- [Risk Matrix](/security/risk-matrix) — Prioritised findings
+- [Action Plan](/security/action-plan) — P0-P3 remediation priorities
+
+## Key Findings
+
+> **Strengths:** VLAN segmentation, UniFi hardening, Tailscale mesh, ASUS firewall configuration.
+
+> **Critical Gaps:** No local DNS, Proxmox LAN-offline, no backup verification, Frigate on management VLAN, MQTT unencrypted.
+
+> **Immediate Priority:** Document recovery procedures, deploy local DNS, verify backup integrity.
+
+## Infrastructure Status
+
+Currently in transition — the EliteDesk-to-OPNsense migration is in progress, replacing the ASUS EBG19P as the primary gateway. An NVR watchdog crash occurred on 2026-06-30 (root cause: HiSilicon watchdog, not compromise).
+
+Proxmox (192.168.50.190) is reachable via Tailscale but offline on the LAN. Headscale, Mac mini, and CE Link nodes are also offline — likely mid-migration state.

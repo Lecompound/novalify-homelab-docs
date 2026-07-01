@@ -1,0 +1,19 @@
+---
+title: "Risk Matrix"
+description: "Prioritised risk register"
+---
+
+# Risk Matrix
+
+| # | Risk | Severity | Likelihood | Impact | Priority |
+|---|------|----------|-----------|--------|----------|
+| 1 | No verified backups | Critical | Medium | Complete data loss | **P0** |
+| 2 | No IDS/IPS | High | Medium | Undetected compromise | **P1** |
+| 3 | Proxmox LAN-offline | High | Low | Single mgmt failure point | **P1** |
+| 4 | No centralized logging | High | Medium | Delayed detection | **P1** |
+| 5 | Hikvision CVE exposure | High | Low | Camera compromise | **P1** |
+| 6 | MQTT/Samba on MGMT VLAN | Medium | Medium | Lateral movement | **P2** |
+| 7 | No incident response plan | Medium | Medium | Delayed containment | **P2** |
+| 8 | No local DNS | Medium | Medium | Service discovery failures | **P2** |
+| 9 | No secrets rotation | Medium | Low | Credential exposure | **P3** |
+| 10 | No patch schedule | Medium | Low | Accumulated vulns | **P3** |

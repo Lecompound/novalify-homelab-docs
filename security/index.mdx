@@ -1,0 +1,32 @@
+---
+title: "Security Review"
+description: "Enterprise-grade security assessment of the lecompound.ebg homelab"
+---
+
+# Security Review
+
+## Overall Posture: C+ (Developing)
+
+Assessed across 8 domains against enterprise-grade controls adapted for the small-network context.
+
+**Strengths:** VLAN segmentation, UniFi switch hardening, Tailscale mesh, ASUS firewall configuration.
+
+**Critical Gaps:**
+- No local DNS resolution
+- Proxmox LAN-offline (Tailscale only)
+- No verified backup integrity
+- Frigate on management VLAN (camera traffic bypasses isolation)
+- MQTT unencrypted on management VLAN
+
+## Domain Summary
+
+| Domain | Rating | Critical Issues |
+|--------|--------|----------------|
+| Perimeter | ✅ Low | — |
+| Segmentation | ⚠ Medium | Frigate on MGMT, MQTT exposed |
+| Access Control | ⚠ Medium | ACLs pending, SSH audit needed |
+| Monitoring | 🔴 High | No IDS/IPS, no syslog, no alerting |
+| Patching | 🔴 High | Hikvision CVE risk, no automation |
+| Backup | 🔴 Critical | No verification, no runbook |
+| Incident Response | 🔴 High | No plan, no tabletop |
+| Secrets | ⚠ Medium | Plaintext keys, no rotation |

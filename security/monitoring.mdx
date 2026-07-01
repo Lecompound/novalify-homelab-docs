@@ -1,0 +1,38 @@
+---
+title: "4. Monitoring & Detection"
+description: "Current monitoring capabilities and gaps"
+---
+
+# 4. Monitoring & Detection
+
+## Current Stack
+
+| Tool | Purpose | Coverage |
+|------|---------|----------|
+| Prometheus | Metrics collection | Local only |
+| Loki | Log aggregation | Local only |
+| Grafana | Dashboards | Accessible |
+| Blackbox Exporter | External probing | Configured |
+| Process Monitor | System health | Running |
+
+## Critical Gaps
+
+### No IDS/IPS — HIGH
+No Suricata or Snort on the network. No real-time threat detection capability.
+
+### No Centralized Logging — HIGH
+Loki is running but no syslog forwarding from ASUS, UniFi Switch, or Hikvision NVR. If a device is compromised, the logs stay on the device and are likely deleted by the attacker.
+
+### No Alerting — MEDIUM
+Prometheus and Grafana are configured but there is no Alertmanager → Telegram pipeline. Detection happens only when someone checks a dashboard.
+
+### No Network Flow Analysis — MEDIUM
+No NetFlow/IPFIX collection. No baseline for what "normal" traffic looks like.
+
+## Recommendations
+
+1. Deploy **Suricata** on OPNsense once migration completes (built-in)
+2. Configure **syslog forwarding** from all devices → Loki
+3. Set up **Prometheus Alertmanager** with Telegram notification
+4. Run periodic **vulnerability scans** with Trivy
+5. Enable **NVR system log forwarding**

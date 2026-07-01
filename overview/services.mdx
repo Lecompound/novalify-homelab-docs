@@ -1,0 +1,39 @@
+---
+title: "Network Services"
+description: "DHCP, DNS, VPN, and monitoring services"
+---
+
+# Network Services
+
+## DHCP
+
+- **Server:** ASUS EBG19P (192.168.50.1)
+- **Scopes:** All four active VLANs
+- **DNS assigned:** Cloudflare 1.1.1.2 / 1.0.0.2 (family-filtered)
+
+## DNS
+
+- Primary: ASUS port 53 → Cloudflare forwarders
+- **No local DNS** — `pve.ebg`, `ha.ebg` etc. all NXDOMAIN
+- This is a **critical gap** — all services rely on static IPs
+
+## VPN — Tailscale
+
+| Node | Tailscale IP | Status |
+|------|-------------|--------|
+| pve | 100.89.90.38 | Active (relay) |
+| ss-mac-mini | 100.89.223.127 | Active |
+| iphone-13-pro-max | 100.108.39.27 | Active |
+| lecompound | 100.89.175.96 | 1d offline |
+
+> No subnet router configured. The tailnet provides identity-based access but does **not** bridge LAN segments. This is correct for security.
+
+## Monitoring Stack (Hermes Mac)
+
+| Tool | Port | Purpose |
+|------|------|---------|
+| Prometheus | 9090 | Metrics (localhost only) |
+| Loki | 3100 | Log aggregation |
+| Grafana | 3000 | Dashboards |
+| Blackbox Exporter | 9115 | External probing |
+| Process Monitor | 8790 | System health |

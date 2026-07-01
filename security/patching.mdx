@@ -1,0 +1,38 @@
+---
+title: "5. Patch & Vulnerability Management"
+description: "Software versions and patching processes"
+---
+
+# 5. Patch & Vulnerability Management
+
+## Software Versions
+
+| Host | Component | Version | Status |
+|------|-----------|---------|--------|
+| UniFi (.10) | OpenSSH | 9.6p1 | ✅ Current |
+| NCP (.145) | OpenSSH | 9.2p1 | ✅ Current (Debian 12) |
+| HA (.169) | aiohttp/Python | 3.13.5 / 3.14 | ✅ Current |
+| Hermes Mac (.149) | OpenSSH | 10.3 | ✅ Current |
+| NVR (.168) | Hikvision firmware | Dec 2025 | ❓ Check for CVEs |
+
+## Gaps
+
+### Hikvision CVE Risk — HIGH
+Hikvision devices have known remote code execution vulnerabilities (CVE-2021-36260, others). The NVR is on an isolated VLAN which mitigates but does not eliminate the risk.
+
+### No Automated Patching — MEDIUM
+No unattended-upgrades or documented patch schedule. Systems may run for extended periods without security updates.
+
+### No CVE Monitoring — MEDIUM
+No routine checks for product CVEs affecting Hikvision, UniFi, or ASUS hardware.
+
+### No Firmware Baseline — MEDIUM
+Current firmware versions are not recorded or tracked.
+
+## Recommendations
+
+1. Establish a **monthly patch cadence** with documented changelog
+2. Monitor **Hikvision PSIRT** and **Ubiquiti release notes**
+3. Subscribe to **CVE feeds** for all in-use software
+4. Document a **firmware baseline** for each device
+5. Implement **automatic security updates** on Debian/Ubuntu hosts

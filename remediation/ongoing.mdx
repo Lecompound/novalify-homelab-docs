@@ -1,0 +1,49 @@
+---
+title: "6. Ongoing Procedures"
+description: "Maintenance cadence and quarterly checklist"
+---
+
+# 6. Ongoing Procedures
+
+## Monthly Patch Cadence
+
+First Monday of each month:
+
+```bash
+# Check available updates
+ssh root@192.168.50.145 "apt update && apt list --upgradable"
+ssh root@100.89.90.38 "apt update && pveupdate && pveupgrade"
+
+# Apply and reboot if kernel update
+ssh root@192.168.50.145 "apt upgrade -y && systemctl reboot"
+```
+
+## Firmware Tracking
+
+Maintain `~/Documents/Nova/firmware-baseline.md`:
+
+| Device | Version | Last Check |
+|--------|---------|-----------|
+| ASUS EBG19P | (check admin UI) | Monthly |
+| UniFi USW-8-150W | (check controller) | Monthly |
+| Hikvision NVR | Dec 2025 | Quarterly |
+| Proxmox PVE | (check pveversion) | Monthly |
+
+## Quarterly Security Checklist
+
+- [ ] All firmware versions current
+- [ ] No new CVEs for in-use software
+- [ ] SSH key-only enforced on all hosts
+- [ ] No unexpected open ports
+- [ ] Backup integrity verified
+- [ ] Secrets rotation done (90 days)
+- [ ] IR tabletop exercise completed
+
+## Implementation Timeline
+
+| Week | Tasks |
+|------|-------|
+| 1 | P0: Proxmox restoration + backup verification |
+| 2 | P1: Local DNS |
+| 3 | P1: MQTT TLS + Frigate quick-fix firewall rules |
+| 4 | P2: IoT VLAN provisioning + Frigate migration |

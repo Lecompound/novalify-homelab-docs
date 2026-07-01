@@ -1,0 +1,29 @@
+---
+title: "3. Access Control & Identity"
+description: "Tailscale, SSH, and web interface security"
+---
+
+# 3. Access Control & Identity
+
+## Tailscale Mesh
+
+| Control | Status | Assessment |
+|---------|--------|------------|
+| Identity-based access | ✅ | All nodes via Tailscale ACLs |
+| Subnet router | ✅ **Not enabled** | Correct — preserves VLAN isolation |
+| Device auth | ✅ | Node keys with expiry |
+| ACL enforcement | ⚠ Pending | Deployed but ACLs not finalised per June 29 doc |
+| MFA | ✅ | Available at account level |
+
+## SSH Access
+
+| Host | Auth | Assessment |
+|------|------|------------|
+| UniFi (.10) | Key-only | ✅ Good |
+| NCP (.145) | Debian 12 default | ⚠ Verify key-only enforced |
+| PVE (.190) | Key-based (presumed) | Probable via Tailscale |
+| NVR (.168) | Web UI | ❌ Telnet disabled but web interface exposed |
+
+## Web Interfaces
+
+All management interfaces use HTTPS with self-signed certificates — acceptable for LAN-only access. The Cloudflare tunnel provides valid TLS for external HA access via `miniapp.lecompound.us`.

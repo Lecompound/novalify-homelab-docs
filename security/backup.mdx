@@ -1,0 +1,39 @@
+---
+title: "6. Backup & Recovery"
+description: "Backup capabilities, verification, and recovery readiness"
+---
+
+# 6. Backup & Recovery
+
+## Detected Capabilities
+
+| Asset | Method | Verified? |
+|-------|--------|-----------|
+| PVE | VM snapshots | ❌ Not tested |
+| Home Assistant | Supervisor snapshots | ❌ Not tested |
+| UniFi Controller | Config backup | ❓ Unknown |
+| NVR | HDD recording | N/A (footage) |
+| Hermes Mac | Time Machine | ❓ Unknown |
+| ASUS config | Export | ❓ Unknown |
+
+## Gaps
+
+### No Backup Verification — CRITICAL
+Unknown whether any backup is restorable. A backup that has never been restored is not a backup — it's a hope.
+
+### No Off-Site Backup — HIGH
+All backups are presumed local. A physical failure (fire, theft, PSU surge) would destroy both primary data and backups.
+
+### No Documented Recovery Procedures — HIGH
+No playbook exists for full recovery from hardware failure. In an emergency, steps would be improvised.
+
+### No Ransomware Resilience — MEDIUM
+Immutable backups not confirmed. Ransomware could encrypt backup targets.
+
+## Recommendations
+
+1. **Test a restoration** of the most recent PVE VM and HA snapshots immediately
+2. Implement **3-2-1 backup strategy** (3 copies, 2 media types, 1 off-site)
+3. Document **recovery runbook** for each critical service
+4. Configure **automated backup verification** with integrity checks
+5. Establish **retention policy** for NVR footage (30/60/90 day rotation)

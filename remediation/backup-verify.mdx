@@ -1,0 +1,161 @@
+---
+title: "2. Backup Verification"
+description: "Verify PVE, HA, and UniFi backup integrity; create recovery runbook"
+---
+
+# 2. Backup Verification
+
+## PVE Backup Integrity
+
+Prerequisites: PVE accessible via Tailscale or LAN. `vzdump` or PBS configured.
+
+### Check Backups Exist
+
+```bash
+ssh root@100.89.90.38 "ls -la /var/lib/vz/dump/ 2>/dev/null || ls -la /backup/ 2>/dev/null || find / -name '*.vma.gz' -o -name '*.vma' 2>/dev/null | head -20"
+```
+
+### Verify VM Archive Integrity
+
+```bash
+ssh root@100.89.90.38 \
+  'for f in /var/lib/vz/dump/*.vma.gz; do \
+     gzip -t "$f" && echo "OK: $f" || echo "CORRUPT: $f"; \
+   done'
+```
+
+### Verify LXC Archive Integrity
+
+```bash
+ssh root@100.89.90.38 \
+  'for f in /var/lib/vz/dump/*.tar.*; do \
+     gzip -t "$f" && echo "OK: $f" || echo "CORRUPT: $f"; \
+   done'
+```
+
+### Test-Restore VM (Non-Destructive)
+
+Restores to VM ID 200 so the original VM (ID 100) is untouched.
+
+```bash
+ssh root@100.89.90.38 \
+  "qmrestore /var/lib/vz/dump/vzdump-qemu-100-*.vma.gz 200 --unique true"
+
+ssh root@100.89.90.38 "qm start 200 && qm wait 200 --timeout 30"
+
+# Check it's operational
+ssh root@100.89.90.38 "qm guest cmd 200 ping 192.168.50.1 -c 2"
+
+# Cleanup test VM
+ssh root@100.89.90.38 "qm stop 200 && qm destroy 200"
+```
+
+## Home Assistant Backup Verification
+
+### Get HA API Token
+
+1. Home Assistant web UI → bottom-left profile icon → Long-Lived Access Tokens
+2. Create token, save it — this will be `$HA_TOKEN` in commands below
+
+### Check Existing Snapshots
+
+```bash
+# Via HA Supervisor
+ssh root@192.168.50.169 "ha backups list" 2>/dev/null || \
+curl -s -H "Authorization: Bearer $HA_TOKEN" \
+  http://192.168.50.169:8123/api/backups | python3 -m json.tool
+```
+
+### Create Fresh Snapshot
+
+```bash
+curl -s -X POST -H "Authorization: Bearer $HA_TOKEN" \
+  http://192.168.50.169:8123/api/backups | python3 -m json.tool
+```
+
+### Download and Verify
+
+```bash
+# If SSH is available on HA host
+scp root@192.168.50.169:/backup/*.tar ~/Downloads/
+tar -tzf ~/Downloads/*.tar | head -20
+
+# If SSH is not available, download via HA API
+curl -s -H "Authorization: Bearer $HA_TOKEN" \
+  "http://192.168.50.169:8123/api/backups/$(curl -s -H "Authorization: Bearer $HA_TOKEN" http://192.168.50.169:8123/api/backups | python3 -c "import sys,json;d=json.load(sys.stdin);print(d[0]['slug'])")/download" \
+  -o ~/Downloads/ha-backup.tar
+tar -tzf ~/Downloads/ha-backup.tar | head -20
+```
+
+## UniFi Controller Backup
+
+### Via the Controller (.145)
+
+```bash
+# Controller backup directory
+ssh root@192.168.50.145 "ls -la /usr/lib/unifi/data/backup/"
+
+# Download
+scp root@192.168.50.145:/usr/lib/unifi/data/backup/*.unf ~/Downloads/
+```
+
+### Via Controller API
+
+```bash
+# Requires UniFi admin credentials
+curl -sk -u "admin:$UNIFI_PASSWORD" -X POST \
+  "https://192.168.50.10:8443/api/s/default/cmd/backup" \
+  | python3 -m json.tool
+```
+
+## Recovery Runbook
+
+Create as `~/Documents/Nova/Recovery-Runbook.md`:
+
+### Service Priority Matrix
+
+| Priority | Service | RTO | RPO | Dependencies |
+|----------|---------|-----|-----|-------------|
+| P1 | Internet connectivity | 15 min | N/A | Telstra modem, ASUS/OPNsense |
+| P1 | Home Assistant | 1 hr | 24 hr | PVE/.169 host, backups |
+| P2 | Camera/NVR | 4 hr | 24 hr | NVR hardware, camera PoE |
+| P2 | UniFi switching | 1 hr | N/A | PoE injector, trunk config |
+| P3 | Grafana/Loki | 8 hr | 1 week | Hermes Mac |
+| P3 | Tailscale | 2 hr | N/A | Internet connectivity |
+
+### Full Infrastructure Failure
+
+1. Power on Telstra modem → wait 2 min for sync
+2. Power on ASUS EBG19P → verify internet on LAN (.1 reachable)
+3. Power on UniFi switch → verify trunk to ASUS
+4. Power on Proxmox NUC → wait 30-60s for boot
+5. Start critical VMs: `qm start 100 && qm start 101`
+6. Power on HA host (.169) → wait for HA to start
+7. Verify: internet connectivity, HA dashboard, camera feeds
+
+### Single Service Recovery
+
+**HA Failure:**
+```
+1. ssh to .169 or PVE console
+2. systemctl restart home-assistant
+3. journalctl -u home-assistant -n 50  (check logs)
+4. If corrupt → restore from last known-good snapshot
+```
+
+**UniFi Switch Failure:**
+```
+1. Verify PoE injector / PSU
+2. ssh admin@192.168.50.10
+3. show system — check uptime, temp
+4. Factory reset as last resort: hold reset button 10s
+5. Re-adopt via UniFi controller (.145:8443)
+```
+
+### Data Restoration Steps
+
+**Restore PVE VM:**
+```bash
+qmrestore <backup-file> <vmid> --unique true
+qm start <vmid>
+```

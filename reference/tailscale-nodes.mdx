@@ -1,0 +1,20 @@
+---
+title: "Tailscale Nodes"
+description: "Tailscale mesh network node inventory"
+---
+
+# Tailscale Nodes
+
+| Node | Tailscale IP | LAN IP | OS | Status |
+|------|-------------|--------|----|--------|
+| pve | 100.89.90.38 | 192.168.50.190 | Linux | Active (relay) |
+| ss-mac-mini | 100.89.223.127 | 192.168.50.16 | macOS | Active |
+| iphone-13-pro-max | 100.108.39.27 | — | iOS | Active |
+| lecompound | 100.89.175.96 | — | Linux | 1d offline (relay syd) |
+
+## Architecture Notes
+
+- **No subnet router** — Tailscale does not bridge to any LAN subnet
+- **Identity-based access** — all nodes authenticate via Tailscale ACLs
+- **No LAN bridging** — the tailnet preserves VLAN isolation at Layer 2
+- **Client version mismatch** — current client 1.98.5 vs tailscaled 1.98.5 (minor variant, non-critical)

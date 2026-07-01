@@ -1,0 +1,57 @@
+---
+title: "Device Inventory"
+description: "Complete host inventory with MAC, OS, services, and versions"
+---
+
+# Device Inventory
+
+## LAN — Online Hosts
+
+### ASUS EBG19P (.1)
+| Field | Value |
+|-------|-------|
+| Manufacturer | ASUS |
+| MAC | cc:28:aa:68:f2:c2 |
+| Role | Gateway, Router, DHCP, DNS |
+| OS | ASUSWRT (httpd/3.0) |
+| Open Ports | 53 (DNS/Cloudflare), 80 (HTTP→HTTPS redirect), 7788 (unknown), 8443 (HTTPS admin), 18017 (unknown), 53916-17 (unknown) |
+
+### UniFi USW-8-150W (.10)
+| Field | Value |
+|-------|-------|
+| Manufacturer | Ubiquiti (MAC: bc:24:11) |
+| Role | Managed switch, L2 isolation |
+| OS | Ubuntu Linux, OpenSSH 9.6p1 |
+| Open Ports | 22 (SSH), 6789, 8080 (inform), 8443 (HTTPS UI), 8843 (SSL/Tomcat), 8880 (HTTP), 28082 |
+
+### UniFi Network Controller (.145)
+| Field | Value |
+|-------|-------|
+| Manufacturer | Ubiquiti (MAC: bc:24:11) |
+| Role | UniFi controller software host |
+| OS | Debian 12, OpenSSH 9.2p1 |
+| Open Ports | 22 (SSH only) |
+
+### Hermes Mac (.149)
+| Field | Value |
+|-------|-------|
+| MAC | 1c:f6:4c:4e:34:41 |
+| Role | Scan host, monitoring, MCP servers |
+| OS | macOS, OpenSSH 10.3 |
+| Open Ports | 22, 631, 3000 (Grafana), 3100 (Loki), 6060, 8021, 8080, 8642, 8765 (nmem-mcp), 8790 (ProcMon), 9090/9096 (Prometheus), 9115 (Blackbox), 9119 (HA proxy), 27123-4 (Obsidian MCP), 49153 |
+
+### Hikvision NVR DS-7608NXI-K2/8P (.168)
+| Field | Value |
+|-------|-------|
+| Manufacturer | Hikvision (MAC: 88:de:39) |
+| Role | NVR, camera recording and RTSP |
+| Firmware | Dec 2025 build |
+| Open Ports | 80 (HTTP→HTTPS), 443 (HTTPS UI), 554 (RTSP), 7681 (unknown), 8000 (IPCam control), 8443 (HTTPS-alt) |
+
+### Home Assistant (.169)
+| Field | Value |
+|-------|-------|
+| MAC | 02:e9:84:e0:ab:45 |
+| Role | Home automation, Frigate, MQTT broker |
+| OS | Python 3.14, aiohttp 3.13.5 |
+| Open Ports | 111 (rpcbind), 139/445 (Samba), 1883-4 (MQTT), 4357, 5355, 8123 (HA UI), 8555 (Frigate), 18555, 21064-75 |

@@ -1,0 +1,99 @@
+{
+  "name": "lecompound.ebg Homelab",
+  "logo": {
+    "dark": "/logo-dark.svg",
+    "light": "/logo-light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#2F5496",
+    "light": "#4A7FD4",
+    "dark": "#1A3560",
+    "anchors": {
+      "from": "#2F5496",
+      "to": "#4A7FD4"
+    }
+  },
+  "topbarCtaButton": {
+    "name": "Dashboard",
+    "url": "https://miniapp.lecompound.us"
+  },
+  "topbarLinks": [
+    {
+      "name": "Tailscale Admin",
+      "url": "https://login.tailscale.com"
+    }
+  ],
+  "tabs": [
+    {
+      "name": "Network Overview",
+      "url": "overview"
+    },
+    {
+      "name": "Security Review",
+      "url": "security"
+    },
+    {
+      "name": "Remediation",
+      "url": "remediation"
+    },
+    {
+      "name": "Reference",
+      "url": "reference"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "overview/index",
+        "overview/topology",
+        "overview/vlans",
+        "overview/devices",
+        "overview/services"
+      ]
+    },
+    {
+      "group": "Security Review",
+      "pages": [
+        "security/index",
+        "security/perimeter",
+        "security/segmentation",
+        "security/access-control",
+        "security/monitoring",
+        "security/patching",
+        "security/backup",
+        "security/incident-response",
+        "security/secrets",
+        "security/risk-matrix",
+        "security/action-plan"
+      ]
+    },
+    {
+      "group": "Remediation",
+      "pages": [
+        "remediation/index",
+        "remediation/proxmox-restore",
+        "remediation/backup-verify",
+        "remediation/local-dns",
+        "remediation/mqtt-tls",
+        "remediation/iot-vlan",
+        "remediation/ongoing"
+      ]
+    },
+    {
+      "group": "Reference",
+      "pages": [
+        "reference/index",
+        "reference/device-inventory",
+        "reference/api-endpoints",
+        "reference/mcp-servers",
+        "reference/tailscale-nodes",
+        "reference/glossary"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "website": "https://lecompound.us"
+  }
+}

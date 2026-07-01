@@ -1,0 +1,103 @@
+---
+title: "1. Proxmox LAN Restoration"
+description: "Diagnose and fix Proxmox LAN-offline state"
+---
+
+# 1. Proxmox LAN Restoration
+
+## Current State
+
+Proxmox at 192.168.50.190 is reachable via Tailscale (100.89.90.38) but not via LAN. The ARP entry is present (MAC `1c:69:7a:0a:87:1d`) but the host does not respond to TCP or ICMP on its LAN interface.
+
+## Diagnosis
+
+### Via Tailscale (primary path)
+
+```bash
+# Connectivity check
+ping -c 3 100.89.90.38
+
+# PVE system status
+ssh root@100.89.90.38 "hostname -I && uptime && systemctl is-active pveproxy"
+
+# Check LAN interface IP config — may have changed during migration
+ssh root@100.89.90.38 "ip addr show vmbr0"
+ssh root@100.89.90.38 "cat /etc/network/interfaces | grep -A10 vmbr0"
+ssh root@100.89.90.38 "ip route show"
+
+# Check PVE firewall
+ssh root@100.89.90.38 "systemctl is-active pve-firewall && pve-firewall status"
+ssh root@100.89.90.38 "cat /etc/pve/firewall/host.fw"
+```
+
+### From LAN Side
+
+```bash
+# Check if UniFi switch sees the MAC on port 2
+ssh admin@192.168.50.10 "show mac-address-table | grep 1c:69:7a:0a:87:1d"
+
+# Check port 2 status and recent history
+ssh admin@192.168.50.10 "show interface port 2 status"
+ssh admin@192.168.50.10 "show log | grep -i 'port 2' | tail -20"
+```
+
+## Common Causes & Fixes
+
+| Cause | Symptom | Action |
+|-------|---------|--------|
+| **Powered off** | No ARP, no Tailscale | Power on NUC |
+| **Firewall blocking LAN** | ARP present, Tailscale works | Add persistent allow rule (see below) |
+| **IP changed** | Old IP dead, new IP unknown | Check `ip addr` via Tailscale, update docs |
+| **Cable/port issue** | No link light or flapping | Check UniFi port status, reseat cable |
+| **VLAN mismatch** | ARP in wrong VLAN | Verify UniFi port 2 VLAN = 1 |
+
+## Restoration
+
+### If Firewall Blocking — Persistent Fix
+
+```bash
+# Via Tailscale — edit PVE host firewall
+ssh root@100.89.90.38 "cat >> /etc/pve/firewall/host.fw << 'EOF'
+
+[OPTIONS]
+enable: 1
+
+[RULES]
+# Allow management LAN access
+IN ACCEPT -source 192.168.50.0/24 -log nolog
+IN ACCEPT -source 100.64.0.0/10 -log nolog
+EOF"
+
+ssh root@100.89.90.38 "pve-firewall restart"
+```
+
+### If Static IP Changed — Fix and Reboot
+
+```bash
+ssh root@100.89.90.38 "cat > /etc/network/interfaces << 'EOF'
+auto lo
+iface lo inet loopback
+
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.50.190/24
+    gateway 192.168.50.1
+    bridge-ports enp1s0
+    bridge-stp off
+    bridge-fd 0
+EOF"
+
+ssh root@100.89.90.38 "systemctl restart networking"
+# or reboot: ssh root@100.89.90.38 "reboot"
+```
+
+### Verify
+
+```bash
+curl -sk https://192.168.50.190:8006/ | head -5
+# Should return PVE login page HTML
+```
+
+## Rollback
+
+If PVE doesn't come back on LAN, Tailscale remains functional as the fallback management path. Document any IP changes in the Obsidian vault.

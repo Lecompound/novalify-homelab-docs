@@ -1,0 +1,30 @@
+---
+title: "Physical Topology"
+description: "Cabling and port assignments"
+---
+
+# Physical Topology
+
+## Internet Ingress
+
+```
+5G Telstra → Telstra Modem → ASUS EBG19P (WAN)
+```
+
+## Switching
+
+The ASUS EBG19P routes to the UniFi USW-8-150W via a trunk port carrying all VLANs.
+
+## Port Map
+
+| Port | Device | VLAN | Status |
+|------|--------|------|--------|
+| UniFi 1 | Trunk → ASUS | All (1 native + 30/40/50/90 tagged) | Active |
+| UniFi 2 | Proxmox NUC (.190) | 1 (MGMT) | Offline |
+| UniFi 3 | Hermes Mac (.149) | 1 (MGMT) | Active |
+| UniFi 4 | Mac mini (.16) | 50 (ISOLATED) | Offline |
+| UniFi 5 | Hikvision NVR (.168) | 40 (CAMERA) | Active |
+| UniFi 6 | HA (.169) / NCP (.145) | 1 (MGMT) | Active |
+| UniFi 7-8 | Disabled | — | Disabled |
+
+> Ports 2-4 on the ASUS are set to Trunk mode (native VLAN 1 untagged + tagged 40/50/90).

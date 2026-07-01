@@ -1,0 +1,23 @@
+---
+title: "API Endpoints"
+description: "All discovered HTTP, RTSP, and MQTT endpoints"
+---
+
+# API Endpoints
+
+| Endpoint | Type | Auth | Notes |
+|----------|------|------|-------|
+| 192.168.50.1:80 | ASUS Router HTTP | Yes | Redirects to HTTPS |
+| 192.168.50.1:8443 | ASUS Router HTTPS | Yes | Admin web interface |
+| 192.168.50.10:8080 | UniFi Inform | Device | Switch inform channel |
+| 192.168.50.10:8443 | UniFi Controller | Yes | Management UI |
+| 192.168.50.168:80 | NVR HTTP | Yes | Redirects to HTTPS |
+| 192.168.50.168:443 | NVR HTTPS | Yes | Hikvision web UI |
+| 192.168.50.168:554 | NVR RTSP | Yes | Camera streams |
+| 192.168.50.168:8000 | IPCam control | Yes | Hikvision API |
+| 192.168.50.169:8123 | Home Assistant | Yes | Dashboard, automations |
+| 192.168.50.169:1883 | MQTT | Potentially | Mosquitto broker (unencrypted) |
+| 192.168.50.149:3000 | Grafana | Yes | Metrics dashboards |
+| 192.168.50.149:3100 | Loki | Yes | Log aggregation |
+| 192.168.50.149:9115 | Blackbox Exporter | Yes | External endpoint monitoring |
+| 192.168.50.149:9119 | HA Dashboard Proxy | Yes | Tunneled HA UI |

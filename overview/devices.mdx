@@ -1,0 +1,28 @@
+---
+title: "Discovered Devices"
+description: "All hosts on the management VLAN"
+---
+
+# Discovered Devices
+
+## Online Hosts
+
+| IP | Device | OS | Key Services |
+|----|--------|----|--------------|
+| .1 | ASUS EBG19P | ASUSWRT | DNS (Cloudflare), Web UI |
+| .10 | UniFi USW-8-150W | Ubuntu | SSH, Controller UI (8443), Inform (8080) |
+| .145 | UniFi Controller | Debian 12 | SSH only |
+| .149 | Hermes Mac | macOS | Grafana, Loki, Prometheus, MCP servers |
+| .168 | Hikvision NVR | Embedded | HTTP/HTTPS, RTSP (554), IPCam API (8000) |
+| .169 | Home Assistant | Python 3.14 | HA UI (8123), MQTT (1883), Frigate (8555) |
+
+## Offline / Expected
+
+| IP | Device |
+|----|--------|
+| .16 | Mac mini (Isolated VLAN) |
+| .89 | Headscale server |
+| .119 | CE Link (secondary) |
+| .190 | Proxmox NUC (reachable via Tailscale) |
+
+> See [Full Device Inventory](/reference/device-inventory) for complete details including MAC addresses, port lists, and OS versions.

@@ -1,0 +1,135 @@
+---
+title: "4. MQTT Security"
+description: "Secure Mosquitto with TLS and authentication — staged cutover"
+---
+
+# 4. MQTT Security
+
+## Current State
+
+Mosquitto MQTT broker on Home Assistant (192.168.50.169:1883) — unencrypted, no authentication enforcement verified.
+
+## Prerequisites
+
+- SSH access to HA host (.169) — or Home Assistant Mosquitto add-on config access
+- `openssl` installed (default on Linux/macOS)
+- `mosquitto-clients` package (for verification): `apt install mosquitto-clients`
+
+## Implementation — Staged Cutover
+
+### Stage 1: Generate TLS Certificates
+
+Run on any Linux host or your Mac:
+
+```bash
+mkdir -p ~/mqtt-certs && cd ~/mqtt-certs
+
+# Certificate Authority
+openssl req -new -x509 -days 3650 -extensions v3_ca \
+  -keyout ca.key -out ca.crt -nodes -subj "/CN=MQTT CA"
+
+# Server cert
+openssl genrsa -out server.key 2048
+openssl req -new -key server.key -out server.csr -subj "/CN=ha.ebg"
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key \
+  -CAcreateserial -out server.crt -days 3650
+
+# Client certs (one per MQTT client)
+openssl genrsa -out frigate-client.key 2048
+openssl req -new -key frigate-client.key -out frigate-client.csr \
+  -subj "/CN=frigate"
+openssl x509 -req -in frigate-client.csr -CA ca.crt -CAkey ca.key \
+  -CAcreateserial -out frigate-client.crt -days 3650
+```
+
+### Stage 2: Deploy Certificates to Mosquitto
+
+```bash
+# Copy certs to HA host
+scp ~/mqtt-certs/ca.crt ~/mqtt-certs/server.crt ~/mqtt-certs/server.key \
+  root@192.168.50.169:/etc/mosquitto/certs/
+
+# Create Mosquitto TLS config
+cat > /etc/mosquitto/conf.d/tls.conf << 'EOF'
+# TLS listener — encrypted, authenticated
+listener 8883
+cafile /etc/mosquitto/certs/ca.crt
+certfile /etc/mosquitto/certs/server.crt
+keyfile /etc/mosquitto/certs/server.key
+require_certificate false
+allow_anonymous false
+password_file /etc/mosquitto/passwd
+
+# Keep port 1883 open during cutover — restrict to localhost only
+listener 1883
+bind_interface lo
+allow_anonymous true
+EOF
+
+# Create credentials
+mosquitto_passwd -c /etc/mosquitto/passwd frigate
+mosquitto_passwd /etc/mosquitto/passwd nova-bridge
+
+# Restart Mosquitto
+systemctl restart mosquitto
+```
+
+Port 1883 stays available on localhost during migration so HA's internal MQTT client keeps working while external clients are migrated.
+
+### Stage 3: Migrate Clients One at a Time
+
+**Frigate config update:**
+```yaml
+mqtt:
+  host: 192.168.50.169
+  port: 8883
+  user: frigate
+  password: "<generated>"
+  tls_ca_certs: /ssl/ca.crt
+  tls_insecure: false
+```
+
+Copy the CA cert to Frigate's SSL directory and restart:
+```bash
+scp ~/mqtt-certs/ca.crt root@192.168.50.169:/ssl/ca.crt
+# Then restart Frigate via HA add-on or systemctl
+```
+
+**Home Assistant MQTT integration:**
+Settings → Devices & Services → MQTT → Configure → Update server to `192.168.50.169:8883`, add TLS CA cert, enter `frigate` or `nova-bridge` credentials.
+
+### Stage 4: Close Port 1883
+
+After all clients are confirmed working on TLS 8883:
+```bash
+# Remove port 1883 from TLS config or delete it
+rm /etc/mosquitto/conf.d/tls.conf  # edit out the 1883 section instead
+systemctl restart mosquitto
+```
+
+## Verification
+
+```bash
+# From any client with the CA cert
+mosquitto_sub -h 192.168.50.169 -p 8883 --cafile ca.crt \
+  -u frigate -P "<password>" -t "test" -v
+
+# Publish a test message
+mosquitto_pub -h 192.168.50.169 -p 8883 --cafile ca.crt \
+  -u frigate -P "<password>" -t "test" -m "ok"
+
+# Verify port 1883 no longer accepts external connections
+mosquitto_sub -h 192.168.50.169 -p 1883 -t "test" -v
+# Should: timeout or connection refused
+```
+
+## Rollback
+
+```bash
+# Restore original config
+rm /etc/mosquitto/conf.d/tls.conf
+systemctl restart mosquitto
+
+# Update clients back to port 1883
+# Remove CA certs from client configs
+```

@@ -1,0 +1,38 @@
+---
+title: "Action Plan"
+description: "P0-P3 remediation priorities"
+---
+
+# Action Plan
+
+## P0 — Immediate (This Week)
+
+- [ ] Verify backup integrity — test-restore PVE VM and HA snapshots
+- [ ] Document recovery runbook — step-by-step for each critical service
+
+## P1 — Short Term (This Month)
+
+- [ ] Deploy OPNsense on EliteDesk — complete ASUS replacement migration
+- [ ] Wire Prometheus Alertmanager → Telegram for real-time alerts
+- [ ] Configure syslog forwarding from ASUS, UniFi, NVR → Loki
+- [ ] Bring Proxmox LAN-reachable — investigate .190 offline state
+- [ ] Check Hikvision firmware against known CVEs
+
+## P2 — Medium Term (Next Quarter)
+
+- [ ] Deploy Suricata on OPNsense once migration complete
+- [ ] Create IoT VLAN for Frigate/HA integration
+- [ ] Enforce SSH key-only on all hosts
+- [ ] Write Incident Response Plan with containment procedures
+- [ ] Deploy local DNS (Pi-hole or Unbound)
+- [ ] Enable MFA on all management interfaces
+
+## P3 — Ongoing
+
+- [ ] Monthly patch cadence with documented changelog
+- [ ] Quarterly tabletop exercises — simulate incidents
+- [ ] Secrets rotation every 90 days
+- [ ] CVE feed subscriptions for all in-use software
+- [ ] Vulnerability scanning per quarter
+
+> Download the full [Gap Remediation Plan.docx](/assets/Gap-Remediation-Plan.docx) for executable steps with commands, config templates, and rollback procedures.

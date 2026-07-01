@@ -1,0 +1,25 @@
+---
+title: "VLANs & Subnets"
+description: "Network segmentation architecture"
+---
+
+# VLANs & Subnets
+
+## VLAN Table
+
+| VLAN | Name | Subnet | DHCP | Internet |
+|------|------|--------|------|----------|
+| 1 | MGMT | 192.168.50.0/24 | ASUS | Yes |
+| 30 | IoT (reserved) | 192.168.30.0/24 | — | — |
+| 40 | CAMERA | 192.168.40.0/24 | ASUS | Blocked |
+| 50 | ISOLATED | 192.168.55.0/24 | ASUS | Yes |
+| 90 | GUEST | 192.168.90.0/24 | ASUS | Yes |
+
+## Security Model
+
+1. **Isolation at the wire** — each VLAN is enforced at the UniFi switch port level
+2. **Access by identity** — Tailscale ACLs govern cross-segment access
+3. **No internet for cameras** — VLAN 40 has no WAN access (correct for security, prevents cloud firmware updates)
+4. **No subnet router** — Tailscale does not bridge to LAN segments
+
+> VLAN 30 is tagged on the trunk but not yet assigned a subnet. Reserved for future IoT use (Frigate isolation).

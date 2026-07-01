@@ -1,0 +1,36 @@
+---
+title: "2. Network Segmentation"
+description: "VLAN architecture and isolation gaps"
+---
+
+# 2. Network Segmentation
+
+## Positive Findings
+
+| VLAN | Purpose | Assessment |
+|------|---------|------------|
+| 1 (MGMT) | Infrastructure management | Appropriate |
+| 40 (CAMERA) | NVR isolation, internet blocked | ✅ Good |
+| 50 (ISOLATED) | Untrusted device containment | ✅ Good |
+| 90 (GUEST) | Guest WiFi | ✅ Good |
+
+## Gaps
+
+### Home Assistant on VLAN 1 — MEDIUM
+Frigate, MQTT, and Samba all run on the management network. Frigate processes camera feeds from VLAN 40, bridging the isolated camera network to management via software. This defeats the purpose of the camera VLAN.
+
+### MQTT Exposed — MEDIUM
+Mosquitto port 1883 open on management VLAN without TLS. Any host on VLAN 1 can connect and subscribe to all topics.
+
+### Samba Exposed — MEDIUM
+SMB ports 139/445 open on the HA host. File share surface on the management network.
+
+### No VLAN 30 — LOW
+Tagged on trunk but no subnet assigned. Reserved for future IoT use.
+
+## Recommendations
+
+1. Create a dedicated **IoT VLAN** for Frigate/HA integration traffic
+2. Enforce **MQTT with TLS** or restrict to Tailscale IPs
+3. Restrict Samba to Tailscale IPs only
+4. Audit ASUS inter-VLAN firewall rules

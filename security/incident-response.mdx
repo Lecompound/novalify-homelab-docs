@@ -1,0 +1,42 @@
+---
+title: "7. Incident Response"
+description: "IR readiness and past incident analysis"
+---
+
+# 7. Incident Response
+
+## Current Capability
+
+| Capability | Status |
+|-----------|--------|
+| Evidence collection | ✅ — nmap, tcpdump, Volatility 3, nmem available |
+| Forensic analysis | ✅ — Disk imaging, memory analysis tools |
+| Network forensic capture | ⚠ — tcpdump available, no permanent capture |
+| Incident documentation | ✅ — Obsidian vault, Neural Memory |
+| Alerting | ❌ — No automated incident alerting |
+
+## Past Incident: NVR Watchdog Crash (2026-06-30)
+
+**DS-7608NXI-K2/8P** experienced an unclean reboot triggered by the HiSilicon watchdog timer.
+
+- RTSP stream died 26 seconds before the link dropped
+- UniFi port 0/4 flapped (same port flapped earlier the same day)
+- Root cause: HiSilicon watchdog, **not** compromise
+- Mitigation: EliteDesk → OPNsense migration in progress
+
+## Gaps
+
+| Gap | Severity | Detail |
+|-----|----------|--------|
+| No written IR plan | HIGH | No formal incident response procedure |
+| No tabletop exercises | MEDIUM | Response capability never tested |
+| No containment runbook | MEDIUM | No fast-path to isolate a compromised host |
+| No alerting chain | MEDIUM | Detection → notification → response not automated |
+
+## Recommendations
+
+1. Create an **Incident Response Plan** covering detection, containment, eradication, recovery
+2. Define **severity classification** aligned with Nova's framework
+3. Document **containment procedures** per segment (disable UniFi port, block via firewall, revoke Tailscale node)
+4. Schedule **quarterly tabletop exercises** (simulate compromise scenarios)
+5. Wire **Prometheus Alertmanager → Telegram** for real-time notification
