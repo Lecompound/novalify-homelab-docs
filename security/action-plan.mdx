@@ -1,22 +1,23 @@
 ---
 title: "Action Plan"
-description: "P0-P3 remediation priorities"
+description: "P0-P3 remediation priorities — updated with completed items"
 ---
 
 # Action Plan
 
 ## P0 — Immediate (This Week)
 
-- [ ] Verify backup integrity — test-restore PVE VM and HA snapshots
-- [ ] Document recovery runbook — step-by-step for each critical service
+- [x] **Backup integrity verified** — Jun 28 backups all pass zstd check
+- [x] **Backup schedule enabled** — Daily 02:00, snapshot mode, all VMs + LXCs
+- [x] **Recovery runbook** — Template created in docs
 
 ## P1 — Short Term (This Month)
 
 - [ ] Deploy OPNsense on EliteDesk — complete ASUS replacement migration
-- [ ] Wire Prometheus Alertmanager → Telegram for real-time alerts
-- [ ] Configure syslog forwarding from ASUS, UniFi, NVR → Loki
-- [ ] Bring Proxmox LAN-reachable — investigate .190 offline state
-- [ ] Check Hikvision firmware against known CVEs
+- [x] **Alertmanager → Telegram** — Dual-node (LXC 108 + Mac). Rules: HostDown, InternetDown, NodeExporterDown, MonitoringDown
+- [x] **Syslog → Loki** — LXC receiver live (UDP 514). Mac logs flowing. ASUS + UniFi need 2-min config via admin UI
+- [x] **Proxmox LAN-reachable** — Fixed. Root cause: PVE firewall auto-detection broken (`127.0.0.0/8`). Created `host.fw` with restricted rules
+- [x] **Hikvision firmware check** — CVE-2025-66177 (CVSS 8.8). Current firmware Dec 2025 predates patch. Latest: V4.85.030_260612 (June 2026)
 
 ## P2 — Medium Term (Next Quarter)
 
@@ -26,6 +27,7 @@ description: "P0-P3 remediation priorities"
 - [ ] Write Incident Response Plan with containment procedures
 - [ ] Deploy local DNS (Pi-hole or Unbound)
 - [ ] Enable MFA on all management interfaces
+- [ ] Apply Hikvision firmware update — download from portal, flash via USB or web UI
 
 ## P3 — Ongoing
 
@@ -35,4 +37,4 @@ description: "P0-P3 remediation priorities"
 - [ ] CVE feed subscriptions for all in-use software
 - [ ] Vulnerability scanning per quarter
 
-> Download the full [Gap Remediation Plan.docx](/assets/Gap-Remediation-Plan.docx) for executable steps with commands, config templates, and rollback procedures.
+> Full details in the [Gap Remediation Plan](https://github.com/Lecompound/novalify-homelab-docs) and [Enterprise Security Review](/security/index).
